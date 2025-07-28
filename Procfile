@@ -1,1 +1,1 @@
-web: python manage.py runserver 0.0.0.0:$PORT
+web: gunicorn modular_project.wsgi:application --bind 0.0.0.0:$PORT
