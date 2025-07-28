@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Landing Page</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 10px; }
+        input { margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Product List</h1>
+
+    <p style="text-align: right;">
+      Logged in as: {{ request.user.username }}
+      <form method="post" action="{% url 'logout' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+      </form>
+    </p>
+
+    {% if role == "manager" or role == "user" %}
+    <h3>{% if edit_product %}Edit{% else %}Add New{% endif %} Product</h3>
+    <form method="post" style="margin-bottom: 20px;">
+        {% csrf_token %}
+        {% if edit_product %}
+            <input type="hidden" name="product_id" value="{{ edit_product.id }}">
+        {% endif %}
+        <input type="text" name="name" placeholder="Name" value="{{ edit_product.name|default_if_none:'' }}" required>
+        <input type="text" name="barcode" placeholder="Barcode" value="{{ edit_product.barcode|default_if_none:'' }}" required>
+        <input type="number" name="price" placeholder="Price" step="0.01" value="{{ edit_product.price|default_if_none:'' }}" required>
+        <input type="number" name="stock" placeholder="Stock" value="{{ edit_product.stock|default_if_none:'' }}" required>
+        <input type="text" name="description" placeholder="Description" value="{{ edit_product.description|default_if_none:'' }}" required>
+        <button type="submit">{% if edit_product %}Update{% else %}Add{% endif %}</button>
+        {% if edit_product %}
+            <a href="{% url 'product-landing' %}">Cancel</a>
+        {% endif %}
+    </form>
+    {% endif %}
+
+    <table>
+        <thead>
+            <tr><th>Name</th><th>Barcode</th><th>Price</th><th>Stock</th><th>Description</th>
+                {% if role == "manager" %}<th>Actions</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.barcode }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.stock }}</td>
+                <td>{{ product.description }}</td>
+                    {% if role == "manager" or role == "user" %}
+                    <td>
+                        {% if role == "manager" or role == "user" %}
+                            <a href="?edit={{ product.id }}">Edit</a>
+                        {% endif %}
+                        {% if role == "manager" %}
+                            | <a href="?delete={{ product.id }}" onclick="return confirm('Are you sure to delete this data?');">Delete</a>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

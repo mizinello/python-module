@@ -1,0 +1,15 @@
+<h1>Modules</h1>
+<ul>
+  {% for key, module in modules.items %}
+    <li>
+      {{ module.verbose_name }} - 
+      {% if key in installed %}
+        Installed |
+        <a href="{% url 'engine:module-upgrade' key %}">Upgrade</a> |
+        <a href="{% url 'engine:module-uninstall' key %}">Uninstall</a>
+      {% else %}
+        <a href="{% url 'engine:module-install' key %}">Install</a>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
